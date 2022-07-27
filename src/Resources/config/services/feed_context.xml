@@ -5,7 +5,6 @@
     <parameters>
         <parameter key="setono_sylius_feed.feed_context.image_type">%env(FEED_CONTEXT_IMAGE_TYPE)%</parameter>
         <parameter key="env(FEED_CONTEXT_IMAGE_TYPE)"/>
-
     </parameters>
     <services>
         <service id="setono_sylius_feed.feed_context.google.shopping"
@@ -16,7 +15,7 @@
             <argument type="service" id="router"/>
             <argument type="service" id="liip_imagine.cache.manager"/>
             <argument type="service" id="sylius.availability_checker"/>
-            <argument type="string" id="setono_sylius_feed.feed_context.image_type"/>
+            <argument key="$imageType">%setono_sylius_feed.feed_context.image_type%</argument>
         </service>
 
         <service id="setono_sylius_feed.feed_context.facebook.catalog"
