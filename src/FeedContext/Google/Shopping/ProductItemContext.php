@@ -49,7 +49,7 @@ class ProductItemContext implements ItemContextInterface
 
     private AvailabilityCheckerInterface $availabilityChecker;
 
-    private ?string $imageType;
+    private string $imageType;
 
     public function __construct(
         RouterInterface $router,
