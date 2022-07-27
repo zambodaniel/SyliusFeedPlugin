@@ -17,6 +17,10 @@ use Setono\SyliusFeedPlugin\Model\BrandAwareInterface;
 use Setono\SyliusFeedPlugin\Model\ColorAwareInterface;
 use Setono\SyliusFeedPlugin\Model\ConditionAwareInterface;
 use Setono\SyliusFeedPlugin\Model\GtinAwareInterface;
+use Setono\SyliusFeedPlugin\Model\LocalizedBrandAwareInterface;
+use Setono\SyliusFeedPlugin\Model\LocalizedColorAwareInterface;
+use Setono\SyliusFeedPlugin\Model\LocalizedSizeAwareInterface;
+use Setono\SyliusFeedPlugin\Model\LocalizedTitleAwareInterface;
 use Setono\SyliusFeedPlugin\Model\MpnAwareInterface;
 use Setono\SyliusFeedPlugin\Model\SizeAwareInterface;
 use Setono\SyliusFeedPlugin\Model\TaxonPathAwareInterface;
@@ -45,14 +49,18 @@ class ProductItemContext implements ItemContextInterface
 
     private AvailabilityCheckerInterface $availabilityChecker;
 
+    private string $imageType;
+
     public function __construct(
         RouterInterface $router,
         CacheManager $cacheManager,
-        AvailabilityCheckerInterface $availabilityChecker
+        AvailabilityCheckerInterface $availabilityChecker,
+        string $imageType
     ) {
         $this->router = $router;
         $this->cacheManager = $cacheManager;
         $this->availabilityChecker = $availabilityChecker;
+        $this->imageType = $imageType;
     }
 
     public function getContextList(object $product, ChannelInterface $channel, LocaleInterface $locale): ContextListInterface
@@ -89,11 +97,16 @@ class ProductItemContext implements ItemContextInterface
             $data->setPrice($price);
             $data->setSalePrice($salePrice);
 
-            if (null !== $translation) {
-                $data->setTitle($translation->getName());
-                $data->setDescription($translation->getDescription());
-                $data->setLink($this->getLink($locale, $translation));
+            if ($variant instanceof LocalizedTitleAwareInterface && $variant->getTitle($locale) !== null) {
+                $data->setTitle($variant->getTitle($locale));
+            } else {
+                if (null !== $translation) {
+                    $data->setTitle($translation->getName());
+                }
             }
+
+            $data->setDescription($translation->getDescription());
+            $data->setLink($this->getLink($locale, $translation));
 
             $data->setCondition(
                 $product instanceof ConditionAwareInterface ?
@@ -104,8 +117,12 @@ class ProductItemContext implements ItemContextInterface
                 $data->setProductType($productType);
             }
 
-            if ($variant instanceof BrandAwareInterface && $variant->getBrand() !== null) {
+            if ($variant instanceof LocalizedBrandAwareInterface && $variant->getBrand($locale) !== null) {
+                $data->setBrand((string) $variant->getBrand($locale));
+            } elseif ($variant instanceof BrandAwareInterface && $variant->getBrand() !== null) {
                 $data->setBrand((string) $variant->getBrand());
+            } elseif ($product instanceof LocalizedBrandAwareInterface && $product->getBrand($locale) !== null) {
+                $data->setBrand((string) $product->getBrand($locale));
             } elseif ($product instanceof BrandAwareInterface && $product->getBrand() !== null) {
                 $data->setBrand((string) $product->getBrand());
             }
@@ -122,14 +139,22 @@ class ProductItemContext implements ItemContextInterface
                 $data->setMpn((string) $product->getMpn());
             }
 
-            if ($variant instanceof SizeAwareInterface && $variant->getSize() !== null) {
+            if ($variant instanceof LocalizedSizeAwareInterface && $variant->getSize($locale) !== null) {
+                $data->setSize((string) $variant->getSize($locale));
+            } elseif ($variant instanceof SizeAwareInterface && $variant->getSize() !== null) {
                 $data->setSize((string) $variant->getSize());
+            } elseif ($product instanceof LocalizedSizeAwareInterface && $product->getSize($locale) !== null) {
+                $data->setSize((string) $product->getSize($locale));
             } elseif ($product instanceof SizeAwareInterface && $product->getSize() !== null) {
                 $data->setSize((string) $product->getSize());
             }
 
-            if ($variant instanceof ColorAwareInterface && $variant->getColor() !== null) {
+            if ($variant instanceof LocalizedColorAwareInterface && $variant->getColor($locale) !== null) {
+                $data->setColor((string) $variant->getColor($locale));
+            } elseif ($variant instanceof ColorAwareInterface && $variant->getColor() !== null) {
                 $data->setColor((string) $variant->getColor());
+            } elseif ($product instanceof LocalizedColorAwareInterface && $product->getColor($locale) !== null) {
+                $data->setColor((string) $product->getColor($locale));
             } elseif ($product instanceof ColorAwareInterface && $product->getColor() !== null) {
                 $data->setColor((string) $product->getColor());
             }
@@ -166,8 +191,9 @@ class ProductItemContext implements ItemContextInterface
     }
 
     private function getVariantImageLink(ProductImagesAwareInterface $imagesAware): ?string {
-        $images = $imagesAware->getImagesByType('main');
-        if ($images->count() === 0) {
+        if (!empty($this->imageType)) {
+            $images = $imagesAware->getImagesByType($this->imageType);
+        } else {
             $images = $imagesAware->getImages();
         }
 
@@ -186,8 +212,9 @@ class ProductItemContext implements ItemContextInterface
 
     private function getImageLink(ImagesAwareInterface $imagesAware): ?string
     {
-        $images = $imagesAware->getImagesByType('main');
-        if ($images->count() === 0) {
+        if (!empty($this->imageType)) {
+            $images = $imagesAware->getImagesByType($this->imageType);
+        } else {
             $images = $imagesAware->getImages();
         }
 

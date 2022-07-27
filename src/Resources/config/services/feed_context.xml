@@ -25,6 +25,7 @@
             <argument type="service" id="router"/>
             <argument type="service" id="liip_imagine.cache.manager"/>
             <argument type="service" id="sylius.availability_checker"/>
+            <argument key="$imageType">%setono_sylius_feed.feed_context.image_type%</argument>
         </service>
     </services>
 </container>
