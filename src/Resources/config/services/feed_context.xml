@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <parameters>
         <parameter key="setono_sylius_feed.feed_context.image_type">%env(FEED_CONTEXT_IMAGE_TYPE)%</parameter>
-        <parameter key="env(FEED_CONTEXT_IMAGE_TYPE)">null</parameter>
+        <parameter key="env(FEED_CONTEXT_IMAGE_TYPE)"/>
 
     </parameters>
     <services>

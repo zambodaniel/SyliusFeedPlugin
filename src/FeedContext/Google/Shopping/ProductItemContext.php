@@ -55,7 +55,7 @@ class ProductItemContext implements ItemContextInterface
         RouterInterface $router,
         CacheManager $cacheManager,
         AvailabilityCheckerInterface $availabilityChecker,
-        ?string $imageType
+        string $imageType
     ) {
         $this->router = $router;
         $this->cacheManager = $cacheManager;
@@ -189,7 +189,7 @@ class ProductItemContext implements ItemContextInterface
     }
 
     private function getVariantImageLink(ProductImagesAwareInterface $imagesAware): ?string {
-        if ($this->imageType !== null) {
+        if (!empty($this->imageType)) {
             $images = $imagesAware->getImagesByType($this->imageType);
         } else {
             $images = $imagesAware->getImages();
@@ -210,7 +210,7 @@ class ProductItemContext implements ItemContextInterface
 
     private function getImageLink(ImagesAwareInterface $imagesAware): ?string
     {
-        if ($this->imageType !== null) {
+        if (!empty($this->imageType)) {
             $images = $imagesAware->getImagesByType($this->imageType);
         } else {
             $images = $imagesAware->getImages();
