@@ -51,16 +51,20 @@ class ProductItemContext implements ItemContextInterface
 
     private string $imageType;
 
+    private string $filter;
+
     public function __construct(
         RouterInterface $router,
         CacheManager $cacheManager,
         AvailabilityCheckerInterface $availabilityChecker,
-        string $imageType
+        string $imageType,
+        string $filter
     ) {
         $this->router = $router;
         $this->cacheManager = $cacheManager;
         $this->availabilityChecker = $availabilityChecker;
         $this->imageType = $imageType;
+        $this->filter = $filter;
     }
 
     public function getContextList(object $product, ChannelInterface $channel, LocaleInterface $locale): ContextListInterface
@@ -207,7 +211,7 @@ class ProductItemContext implements ItemContextInterface
             return null;
         }
 
-        return $this->cacheManager->getBrowserPath((string) $image->getPath(), 'sylius_shop_product_large_thumbnail');
+        return $this->cacheManager->getBrowserPath((string) $image->getPath(), $this->filter);
     }
 
     private function getImageLink(ImagesAwareInterface $imagesAware): ?string
@@ -228,7 +232,7 @@ class ProductItemContext implements ItemContextInterface
             return null;
         }
 
-        return $this->cacheManager->getBrowserPath((string) $image->getPath(), 'sylius_shop_product_large_thumbnail');
+        return $this->cacheManager->getBrowserPath((string) $image->getPath(), $this->filter);
     }
 
     /**

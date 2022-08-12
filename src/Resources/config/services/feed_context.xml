@@ -5,6 +5,8 @@
     <parameters>
         <parameter key="setono_sylius_feed.feed_context.image_type">%env(FEED_CONTEXT_IMAGE_TYPE)%</parameter>
         <parameter key="env(FEED_CONTEXT_IMAGE_TYPE)"/>
+        <parameter key="setono_sylius_feed.feed_context.filter">%env(FEED_CONTEXT_FILTER)%</parameter>
+        <parameter key="env(FEED_CONTEXT_FILTER)">sylius_shop_product_large_thumbnail</parameter>
     </parameters>
     <services>
         <service id="setono_sylius_feed.feed_context.google.shopping"
@@ -16,6 +18,7 @@
             <argument type="service" id="liip_imagine.cache.manager"/>
             <argument type="service" id="sylius.availability_checker"/>
             <argument key="$imageType">%setono_sylius_feed.feed_context.image_type%</argument>
+            <argument key="$filter">%setono_sylius_feed.feed_context.filter%</argument>
         </service>
 
         <service id="setono_sylius_feed.feed_context.facebook.catalog"
@@ -26,6 +29,7 @@
             <argument type="service" id="liip_imagine.cache.manager"/>
             <argument type="service" id="sylius.availability_checker"/>
             <argument key="$imageType">%setono_sylius_feed.feed_context.image_type%</argument>
+            <argument key="$filter">%setono_sylius_feed.feed_context.filter%</argument>
         </service>
     </services>
 </container>
